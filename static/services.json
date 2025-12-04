@@ -1,0 +1,26 @@
+[
+  {
+    "id": "auth-service-group",
+    "gateway_prefix": "/api/v1/auth",
+    "target_service": {
+        "host_var": "AUTH_SERVICE_HOST",
+        "base_path": "/v1/auth"
+    },
+    "timeouts": {
+        "connect_ms": 1000,
+        "read_ms": 8000
+    },
+    "routes": [
+        {
+            "route": "/login",
+            "methods": ["POST"],
+            "auth_required": false
+        },
+        {
+            "route": "/register",
+            "methods": ["POST"],
+            "auth_required": false
+        }
+    ]
+  }
+]
