@@ -40,7 +40,7 @@
   },
   {
     "id": "questionnaire-service",
-    "gateway_prefix": "/api/v1/questionnaire",
+    "gateway_prefix": "/api/questionnaire",
     "target_service": {
         "host_var": "ML_SERVICE_HOST",
         "base_path": "/api/v2"
