@@ -1,10 +1,10 @@
 [
   {
     "id": "auth-service",
-    "gateway_prefix": "/api/auth",
+    "gateway_prefix": "/api",
     "target_service": {
         "host_var": "AUTH_SERVICE_HOST",
-        "base_path": "/api/auth"
+        "base_path": "/api"
     },
     "timeouts": {
         "connect_ms": 3000,
@@ -12,22 +12,22 @@
     },
     "routes": [
         {
-            "route": "/login",
+            "route": "/auth/login",
             "methods": ["POST"],
             "auth_required": false
         },
         {
-            "route": "/register/adult",
+            "route": "/auth/register/student/adult",
             "methods": ["POST"],
             "auth_required": false
         },
         {
-            "route": "/register/tutor",
+            "route": "/auth/register/student/minor",
             "methods": ["POST"],
             "auth_required": false
         },
         {
-            "route": "/register/minor",
+            "route": "/auth/register/tutor",
             "methods": ["POST"],
             "auth_required": false
         },
