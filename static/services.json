@@ -3,83 +3,88 @@
     "id": "auth-service",
     "gateway_prefix": "/api",
     "target_service": {
-        "host_var": "AUTH_SERVICE_HOST",
-        "base_path": "/api"
+      "host_var": "AUTH_SERVICE_HOST",
+      "base_path": "/api"
     },
     "timeouts": {
-        "connect_ms": 3000,
-        "read_ms": 10000
+      "connect_ms": 3000,
+      "read_ms": 10000
     },
     "routes": [
-        {
-            "route": "/auth/login",
-            "methods": ["POST"],
-            "auth_required": false
-        },
-        {
-            "route": "/auth/register/student/adult",
-            "methods": ["POST"],
-            "auth_required": false
-        },
-        {
-            "route": "/auth/register/student/minor",
-            "methods": ["POST"],
-            "auth_required": false
-        },
-        {
-            "route": "/auth/register/tutor",
-            "methods": ["POST"],
-            "auth_required": false
-        },
-        {
-            "route": "/health",
-            "methods": ["GET"],
-            "auth_required": false
-        }
+      {
+        "route": "/auth/login",
+        "methods": ["POST"],
+        "auth_required": false
+      },
+      {
+        "route": "/auth/register/student/adult",
+        "methods": ["POST"],
+        "auth_required": false
+      },
+      {
+        "route": "/auth/register/student/minor",
+        "methods": ["POST"],
+        "auth_required": false
+      },
+      {
+        "route": "/auth/register/tutor",
+        "methods": ["POST"],
+        "auth_required": false
+      },
+      {
+        "route": "/health",
+        "methods": ["GET"],
+        "auth_required": false
+      }
     ]
   },
   {
     "id": "questionnaire-service",
     "gateway_prefix": "/api/questionnaire",
     "target_service": {
-        "host_var": "ML_SERVICE_HOST",
-        "base_path": "/api/v2"
+      "host_var": "ML_SERVICE_HOST",
+      "base_path": "/api/v2"
     },
     "timeouts": {
-        "connect_ms": 5000,
-        "read_ms": 30000
+      "connect_ms": 15000,
+      "read_ms": 180000
     },
     "routes": [
-        {
-            "route": "/session/start",
-            "methods": ["POST"],
-            "auth_required": true
-        },
-        {
-            "route": "/session/:session_id/next-question",
-            "methods": ["GET"],
-            "auth_required": true
-        },
-        {
-            "route": "/session/:session_id/answer",
-            "methods": ["POST"],
-            "auth_required": true
-        },
-        {
-            "route": "/session/:session_id/prediction",
-            "methods": ["GET"],
-            "auth_required": true
-        },
-        {
-            "route": "/health",
-            "methods": ["GET"],
-            "auth_required": false
-        },
-        {
-            "route": "/demo",
-            "methods": ["GET"],
-            "auth_required": false
-        }
+      {
+        "route": "/session/start",
+        "methods": ["POST"],
+        "auth_required": true
+      },
+      {
+        "route": "/session/:session_id/next-question",
+        "methods": ["GET"],
+        "auth_required": true
+      },
+      {
+        "route": "/session/:session_id/answer",
+        "methods": ["POST"],
+        "auth_required": true
+      },
+      {
+        "route": "/session/:session_id/finish",
+        "methods": ["POST"],
+        "auth_required": true
+      },
+      {
+        "route": "/session/:session_id/status",
+        "methods": ["GET"],
+        "auth_required": true
+      },
+      {
+        "route": "/health",
+        "methods": ["GET"],
+        "auth_required": false
+      },
+      {
+        "route": "/demo",
+        "methods": ["GET"],
+        "auth_required": false
+      }
     ]
   }
 ]

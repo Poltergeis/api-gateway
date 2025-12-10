@@ -21,24 +21,6 @@ if (debug_console) {
     });
 }
 
-// ✅ HEALTH CHECK DEL GATEWAY (CORREGIDO)
-app.get('/health', (req: Request, res: Response) => {
-    res.status(200).json({
-        status: 'OK',
-        service: 'API Gateway',
-        port: process.env.PORT || '4000',
-        timestamp: new Date().toISOString(),
-        uptime: Math.floor(process.uptime()),
-        environment: process.env.NODE_ENV || 'development',
-        version: '1.0.0',
-        microservices: {
-            auth_service: process.env.AUTH_SERVICE_HOST || 'not configured',
-            ml_service: process.env.ML_SERVICE_HOST || 'not configured'
-        }
-    });
-});
-
-// Configurar rutas de servicios
 app.use("", await set_services());
 
 const server = http.createServer(app);

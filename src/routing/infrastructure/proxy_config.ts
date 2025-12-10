@@ -19,24 +19,25 @@ export async function set_services(): Promise<Router> {
         const fullTarget = new URL(service.target_service.base_path, target).href;
         signale.info(`Configuring proxy for ${service.id}: ${service.gateway_prefix} -> ${fullTarget}`);
 
-        // ⚡ Configuración básica del proxy
+        const readTimeout = service.timeouts.read_ms || 30000;
+        const connectTimeout = service.timeouts.connect_ms || 10000;
+
+        signale.info(`Service ${service.id} timeouts: connect=${connectTimeout}ms, read=${readTimeout}ms`);
+
         const proxyOptions = {
             target: fullTarget,
             changeOrigin: true,
-            timeout: service.timeouts.read_ms || 30000,
-            proxyTimeout: service.timeouts.connect_ms || 10000,
+            timeout: readTimeout,
+            proxyTimeout: connectTimeout,
             
-            // 🔧 PATHREWRITE simplificado
             pathRewrite: (path: string, req: any) => {
                 signale.debug(`Original path: ${path}`);
                 
-                // Caso especial: Health check del Auth Service
                 if (service.id === 'auth-service' && path === '/api/health') {
                     signale.debug(`Health check rewrite: ${path} -> /health`);
                     return '/health';
                 }
                 
-                // Reescritura normal: quita el gateway_prefix
                 if (path.startsWith(service.gateway_prefix)) {
                     const rewrittenPath = path.substring(service.gateway_prefix.length) || "/";
                     signale.debug(`Normal rewrite: ${path} -> ${rewrittenPath}`);
@@ -46,47 +47,76 @@ export async function set_services(): Promise<Router> {
                 return path;
             },
 
-            // 🚨 MANEJO DE ERRORES simplificado
             onError: (err: any, req: any, res: any, target?: any) => {
                 signale.error(`Proxy error for ${service.id}:`, {
                     error: err.message,
                     code: err.code,
                     target: target,
                     path: req.path,
-                    method: req.method
+                    method: req.method,
+                    timeout_used: readTimeout,
+                    connect_timeout: connectTimeout
                 });
 
                 if (!res.headersSent) {
-                    res.status(503).json({
-                        error: 'Service Unavailable',
-                        message: `Unable to connect to ${service.id}`,
-                        service: service.id,
-                        timestamp: new Date().toISOString()
-                    });
+                    if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.message.includes('timeout')) {
+                        res.status(504).json({
+                            error: 'Gateway Timeout',
+                            message: `${service.id} took too long to respond (timeout: ${readTimeout}ms)`,
+                            service: service.id,
+                            timestamp: new Date().toISOString(),
+                            suggestion: 'The operation is taking longer than expected. Please try again or contact support.'
+                        });
+                    } else if (err.code === 'ECONNREFUSED') {
+                        res.status(503).json({
+                            error: 'Service Unavailable',
+                            message: `Unable to connect to ${service.id}. Service may be down.`,
+                            service: service.id,
+                            timestamp: new Date().toISOString()
+                        });
+                    } else {
+                        res.status(502).json({
+                            error: 'Bad Gateway',
+                            message: `Error communicating with ${service.id}`,
+                            service: service.id,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
                 }
             },
 
-            // 📊 LOGGING básico
             onProxyReq: (proxyReq: any, req: any, res: any, options: any) => {
-                signale.info(`🔄 Proxying: ${req.method} ${req.path} -> ${options.target}${proxyReq.path || ''}`);
+                const isLongRunning = req.path.includes('/finish');
+                if (isLongRunning) {
+                    signale.info(`[LONG REQUEST] Proxying: ${req.method} ${req.path} -> ${options.target}${proxyReq.path || ''} (timeout: ${readTimeout}ms)`);
+                } else {
+                    signale.info(`Proxying: ${req.method} ${req.path} -> ${options.target}${proxyReq.path || ''}`);
+                }
             },
 
             onProxyRes: (proxyRes: any, req: any, res: any) => {
-                signale.info(`✅ Response: ${proxyRes.statusCode} for ${req.method} ${req.path}`);
+                const isLongRunning = req.path.includes('/finish');
+                if (isLongRunning) {
+                    signale.success(`[LONG REQUEST] Response: ${proxyRes.statusCode} for ${req.method} ${req.path}`);
+                } else {
+                    signale.info(`Response: ${proxyRes.statusCode} for ${req.method} ${req.path}`);
+                }
             },
 
-            // 🔒 Configuración segura
-            secure: true,
-            logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'warn'
+            secure: false,
+            logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'warn',
+            
+            headers: {
+                'Connection': 'keep-alive',
+                'Keep-Alive': 'timeout=180'
+            }
         };
 
         const proxy = createProxyMiddleware(proxyOptions);
 
-        // Registrar cada ruta del servicio
         for (const route of service.routes) {
             const methods = route.methods.map(m => m.toLowerCase());
 
-            // 🔐 Middleware de autenticación
             const authMiddleware = route.auth_required
                 ? (req: Request, res: Response, next: NextFunction) => {
                       const authHeader = req.headers.authorization;
@@ -109,7 +139,6 @@ export async function set_services(): Promise<Router> {
             const fullPath = service.gateway_prefix + route.route;
             signale.debug(`Registering route: ${methods.join(',')} ${fullPath}`);
 
-            // Registrar cada método HTTP
             for (const method of methods) {
                 switch (method) {
                     case "get":
@@ -136,9 +165,9 @@ export async function set_services(): Promise<Router> {
             }
         }
 
-        signale.success(`✅ Service ${service.id} configured with ${service.routes.length} routes`);
+        signale.success(`Service ${service.id} configured with ${service.routes.length} routes (timeouts: ${connectTimeout}ms/${readTimeout}ms)`);
     }
 
-    signale.success(`🚀 Gateway configured with ${services.length} services`);
+    signale.success(`Gateway configured with ${services.length} services`);
     return router;
 }
