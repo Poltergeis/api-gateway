@@ -5,7 +5,7 @@
   "main": "dist/src/app.js",
   "scripts": {
     "build": "tsc && npm run copy-static",
-    "copy-static": "copyfiles -V -u 1 src/static/**/* dist/",
+    "copy-static": "copyfiles -V -u 1 /static/**/* dist/",
     "start": "node dist/src/app.js"
   },
   "keywords": [],
