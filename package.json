@@ -22,7 +22,11 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.5",
-    "@types/signale": "^1.4.7"
+    "@types/express": "^5.0.6",
+    "@types/helmet": "^4.0.0",
+    "@types/http-proxy-middleware": "^1.0.0",
+    "@types/node": "^24.10.2",
+    "@types/signale": "^1.4.7",
+    "typescript": "^5.9.3"
   }
 }

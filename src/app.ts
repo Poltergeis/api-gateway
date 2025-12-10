@@ -4,7 +4,7 @@ import signale from "signale";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import http from "http";
-import { set_services } from "./src/routing/infrastructure/proxy_config.js";
+import { set_services } from "./routing/infrastructure/proxy_config.js";
 dotenv.config();
 
 const debug_console = true;

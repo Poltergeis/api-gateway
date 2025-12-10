@@ -1,6 +1,6 @@
 import { ServiceInfo } from "../../domain/service.js";
 import { ServiceInfoRepository } from "../../domain/service_info_repository.js";
-import { services_path } from "../../../../local_paths.js";
+import { services_path } from "../../../local_paths.js";
 import fs from "fs";
 
 export class ServiceInfoRepositoryImpl implements ServiceInfoRepository {
