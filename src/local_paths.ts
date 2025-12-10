@@ -6,4 +6,5 @@ export const __dirname = path.dirname(__filename);
 
 export const services_path = path.join(process.cwd(), "dist", "static", "services.json");
 
-console.log("Services path:", services_path); // Para debug
+console.log("Process CWD:", process.cwd());
+console.log("Services path:", services_path);
