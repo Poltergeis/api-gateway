@@ -7,7 +7,7 @@ app = FastAPI()
 class LoginRequest(BaseModel):
     is_authenticated:bool
 
-@app.post("/v1/auth/login")
+@app.post("/api/auth/login")
 async def login(request: LoginRequest):
     if request.is_authenticated:
         return responses.JSONResponse({

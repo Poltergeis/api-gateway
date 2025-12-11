@@ -13,21 +13,24 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/node": "^24.10.2",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "http-proxy-middleware": "^3.0.5",
-    "@types/node": "^24.10.2",
     "signale": "^1.4.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/helmet": "^4.0.0",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/signale": "^1.4.7",
-    "typescript": "^5.9.3",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "typescript": "^5.9.3"
   }
 }
